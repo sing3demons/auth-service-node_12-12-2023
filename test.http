@@ -1,0 +1,12 @@
+@uri = http://localhost:3000
+
+# @name auth
+GET {{uri}} HTTP/1.1
+
+### Get Token ###
+@token = {{auth.response.body.$.token}}
+
+###
+GET {{uri}}/verify HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{token}}
