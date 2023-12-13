@@ -7,7 +7,7 @@ class Payload {
     this.body = body
   }
 
-  static set(header: Record<string, unknown>, body:Record<string, unknown>) {
+  static set(header: Record<string, unknown>, body: Record<string, unknown>) {
     return new Payload(header, body)
   }
 }

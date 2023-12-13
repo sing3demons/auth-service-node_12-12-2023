@@ -43,7 +43,6 @@ class Auth {
       const secretOrPublicKey = Buffer.from(secret, 'base64')
       const jwtPayload = jwt.verify(token, secretOrPublicKey, verifyOptions)
       const decoded = jwtPayload as PayloadToken
-      console.log(decoded)
       req.user = {
         userId: decoded.userId,
         role: decoded.role,
