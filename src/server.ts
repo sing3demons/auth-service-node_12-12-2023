@@ -3,6 +3,7 @@ import express, { Application } from 'express'
 import Auth from './auth.js'
 import KafkaNode from './kafka.js'
 import Response from './response.js'
+import Hash from './hash.js'
 
 class Server {
   private app: Application
@@ -19,14 +20,32 @@ class Server {
 
   startHttp = () => {
     const port = process.env.PORT || 3000
-    this.app.listen(port, () => {
+    const server = this.app.listen(port, () => {
       console.log(`Server running on port ${port}`)
     })
+
+    process.on('SIGTERM', () => {
+      console.log('SIGTERM signal received: closing HTTP server')
+      server.close(() => {
+        console.log('HTTP server closed')
+        process.exit(0)
+      })
+    })
+
+    process.on('SIGINT', () => {
+      console.log('SIGINT signal received: closing HTTP server')
+      server.close(() => {
+        console.log('HTTP server closed')
+        process.exit(0)
+      })
+    }); 
   }
 }
 
 function Router(app: Application) {
-  app.get('/', (req, res) => {
+  app.get('/', async (req, res) => {
+    const pass = await Hash.hashPassword('123456')
+    console.log(pass)
     const body = {
       userId: '123456789',
       role: 'admin',
