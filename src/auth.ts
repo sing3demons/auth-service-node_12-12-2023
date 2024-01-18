@@ -65,7 +65,7 @@ class Auth {
       throw new Error('Internal Server Error')
     }
     const options: jwt.SignOptions = {
-      expiresIn: expire ? expire : '1h',
+      expiresIn: expire ?? '1h',
       algorithm: 'RS256'
     }
     const secretOrPrivateKey = Buffer.from(secret, 'base64')

@@ -36,18 +36,51 @@ export default class KafkaNode {
     const admin = kafka.admin()
     await admin.connect()
 
-    for (const topic of topics) {
-      const createTopic = await admin.createTopics({
-        topics: [
-          {
-            topic,
-            numPartitions: 3, // Number of partitions
-            replicationFactor: 1 // Replication factor
-          }
-        ]
-      })
-      kafka.logger().info(`Topic ${topic} created with result ${createTopic}`)
+    const listTopics = await admin.listTopics()
+
+    if (listTopics.length) {
+      const noExits = topics.filter((topic) => !listTopics.includes(topic))
+      if (noExits.length > 0) {
+        for (const topic of noExits) {
+          const createTopic = await admin.createTopics({
+            topics: [
+              {
+                topic,
+                numPartitions: 3, // Number of partitions
+                replicationFactor: 1 // Replication factor
+              }
+            ]
+          })
+          kafka.logger().info(`NEW : Topic ${topic} created with result ${createTopic}`)
+        }
+      }
+    } else {
+      for (const topic of topics) {
+        const createTopic = await admin.createTopics({
+          topics: [
+            {
+              topic,
+              numPartitions: 3, // Number of partitions
+              replicationFactor: 1 // Replication factor
+            }
+          ]
+        })
+        kafka.logger().info(`Topic ${topic} created with result ${createTopic}`)
+      }
     }
+
+    if (topics.length > 0) {
+      const noExits = listTopics.filter((topic) => !topics.includes(topic))
+      if (noExits.length > 0) {
+        for (const topic of noExits) {
+          await admin.deleteTopics({
+            topics: [topic]
+          })
+          kafka.logger().info(`DELETE : Topic ${topic} deleted with result ${topic}`)
+        }
+      }
+    }
+   
     await admin.disconnect()
 
     const groupId = process.env.KAFKA_GROUP_ID
